@@ -9,6 +9,8 @@ INPUT_DIR=$(realpath "${PROJECT_DIR}/input")
 OUTPUT_DIR=$(realpath "${PROJECT_DIR}/output")
 UTILS_DIR=$(realpath "${SCRIPT_DIR}/Utils")
 CLEAN_COMPILE_DIR=$(realpath "${UTILS_DIR}/CleanCompile")
+CLEAR_WORKSHEETS_DIR=$(realpath "${UTILS_DIR}/ClearWorksheets")
+SUM_UP_RECORD_CPU_DIR=$(realpath "${UTILS_DIR}/SumUpRecordCpu")
 RECORD_CPU_DIR=$(realpath "${UTILS_DIR}/RecordCpu")
 TESTERS_DIR=$(realpath "${PROJECT_DIR}/../testers")
 #endregion
@@ -27,6 +29,51 @@ RUST_MULTI_THREAD=$(realpath "${TESTERS_DIR}/rust_multi_json_benchmark/target/re
 #endregion
 #endregion
 
+#region Helper methods
+runMultiThreadTest() {
+    LANG="$1"
+    CONFIG="$2"
+    TESTER="$3"
+    TEST_COUNTER="$4"
+    IS_SINGLE_THREAD_MODE="$5"
+
+    RUST_MODE=null
+    RUST_FLAG=null
+    if [ "${IS_SINGLE_THREAD_MODE}" = true ]; then
+        RUST_MODE="s"
+        RUST_FLAG="--single-thread"
+    else
+        RUST_MODE="m"
+        RUST_FLAG=""
+    fi
+
+    CONFIG_FILE="config_${CONFIG}"
+    FULL_PATH_CONFIG="${INPUT_DIR}/${CONFIG_FILE}.json"
+
+    REPORT_FILE_NAME=null
+    if [ "${LANG}" = "Rust" ]; then
+        REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}${RUST_MODE}"
+    else
+        REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}"
+    fi
+
+    FULL_PATH_CSV="${OUTPUT_DIR}/${REPORT_FILE_NAME}.csv"
+    FULL_PATH_XLSX="${OUTPUT_DIR}/${REPORT_FILE_NAME}.xlsx"
+
+    echo "INFO :: Running ${LANG} Multi Thread Benchmark" >/dev/tty
+    "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
+    RECORD_CPU_PID=$!
+
+    "${TESTER}" "${RUST_FLAG}" -s "${FULL_PATH_XLSX}" "${FULL_PATH_CONFIG}" "${TEST_COUNTER}"
+
+    kill "${RECORD_CPU_PID}"
+
+    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark" >/dev/tty
+    node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
+    # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
+}
+#endregion
+
 #region Making sure output directory is ready
 echo "INFO :: Cleaning the output directory: ${OUTPUT_DIR}"
 rm -rf "${OUTPUT_DIR}"
@@ -34,13 +81,8 @@ mkdir -p "${OUTPUT_DIR}"
 #endregion
 
 #region Benchmark Rust
-# "${CLEAN_COMPILE_RUST}" # Shaked-TODO: uncomment this
+"${CLEAN_COMPILE_RUST}" # Shaked-TODO: uncomment this
 
-"${RECORD_CPU}" "${OUTPUT_DIR}/report_rust_2m.csv" &
-RECORD_CPU_PID=$!
-
-"${RUST_MULTI_THREAD}" -s "${OUTPUT_DIR}/report_rust_2m.xlsx" "${INPUT_DIR}/config_2.json" 2
-
-kill "${RECORD_CPU_PID}"
-node "${PATH_TO_CLEAR_WORKSHEET}" "${PATH_TO_OUTPUT_DIR}/report_rust_2m.xlsx"
+# runMultiThreadTest "Rust" 2 "${RUST_MULTI_THREAD}" 10000 true # Shaked-TODO: uncomment this
+runMultiThreadTest "Rust" 2 "${RUST_MULTI_THREAD}" 2 true
 #endregion
