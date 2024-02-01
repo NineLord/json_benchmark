@@ -7,8 +7,6 @@
 /testers/rust_json_benchmark
 /testers/rust_multi_json_benchmark
 /benchmarks/deleteMe
-/benchmarks/input/config_*.json
-/benchmarks/input/smallJson_*.json
-/benchmarks/input/hugeJson_*.json
+/benchmarks/input/*.json
 /benchmarks/output
 /benchmarks/src/Utils/ClearWorksheets/node_modules
