@@ -1,0 +1,14 @@
+/testers/go_json_benchmark
+/testers/go_multi_json_benchmark
+/testers/java_json_benchmark
+/testers/java_multi_json_benchmark
+/testers/node_json_benchmark
+/testers/node_multi_json_benchmark
+/testers/rust_json_benchmark
+/testers/rust_multi_json_benchmark
+/benchmarks/deleteMe
+/benchmarks/input/config_*.json
+/benchmarks/input/smallJson_*.json
+/benchmarks/input/hugeJson_*.json
+/benchmarks/output
+/benchmarks/src/Utils/ClearWorksheets/node_modules
