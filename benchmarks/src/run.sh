@@ -26,6 +26,8 @@ RECORD_CPU=$(realpath "${RECORD_CPU_DIR}/record.sh")
 
 RUST_SINGLE_THREAD=$(realpath "${TESTERS_DIR}/rust_json_benchmark/target/release/json_tester")
 RUST_MULTI_THREAD=$(realpath "${TESTERS_DIR}/rust_multi_json_benchmark/target/release/json_tester")
+GO_SINGLE_THREAD=$(realpath "${TESTERS_DIR}/go_json_benchmark/bin/jsonTester")
+GO_MULTI_THREAD=$(realpath "${TESTERS_DIR}/go_multi_json_benchmark/bin/jsonTester")
 #endregion
 #endregion
 
@@ -64,7 +66,11 @@ runMultiThreadTest() {
     "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
-    "${TESTER}" "${RUST_FLAG}" -s "${FULL_PATH_XLSX}" "${FULL_PATH_CONFIG}" "${TEST_COUNTER}"
+    if [ "${IS_SINGLE_THREAD_MODE}" = true ]; then
+        "${TESTER}" --single-thread -s "${FULL_PATH_XLSX}" "${FULL_PATH_CONFIG}" "${TEST_COUNTER}"
+    else
+        "${TESTER}" -s "${FULL_PATH_XLSX}" "${FULL_PATH_CONFIG}" "${TEST_COUNTER}"
+    fi
 
     kill "${RECORD_CPU_PID}"
 
@@ -81,8 +87,15 @@ mkdir -p "${OUTPUT_DIR}"
 #endregion
 
 #region Benchmark Rust
-"${CLEAN_COMPILE_RUST}" # Shaked-TODO: uncomment this
+: ' # Shaked-TODO: uncomment
+"${CLEAN_COMPILE_RUST}"
+runMultiThreadTest "Rust" 2 "${RUST_MULTI_THREAD}" 10000 true
 
-# runMultiThreadTest "Rust" 2 "${RUST_MULTI_THREAD}" 10000 true # Shaked-TODO: uncomment this
-runMultiThreadTest "Rust" 2 "${RUST_MULTI_THREAD}" 2 true
+"${CLEAN_COMPILE_GO}"
+runMultiThreadTest "Go" 2 "${GO_MULTI_THREAD}" 10000
+'
+
+# "${CLEAN_COMPILE_JAVA}" # Shaked-TODO: uncomment
+# "${CLEAN_COMPILE_NODE_JS}" # Shaked-TODO: uncomment
+# "${CLEAN_COMPILE_BUN}" # Shaked-TODO: uncomment
 #endregion
