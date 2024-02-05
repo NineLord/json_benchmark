@@ -19,6 +19,8 @@ GO_SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/go_json_benchmark/bin")
 GO_MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/go_multi_json_benchmark/bin")
 JAVA_SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/java_json_benchmark")
 JAVA_MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/java_multi_json_benchmark")
+NODE_SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/node_json_benchmark")
+NODE_MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/node_multi_json_benchmark")
 #endregion
 
 #region Files
@@ -37,6 +39,8 @@ GO_SINGLE_THREAD_CMD="./jsonTester" # Shaked-TODO
 GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 JAVA_SINGLE_THREAD_CMD="mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
 JAVA_MULTI_THREAD_CMD="mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
+NODE_SINGLE_THREAD_CMD="npm run start" # Shaked-TODO
+NODE_MULTI_THREAD_CMD="npm run start -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 #endregion
 #endregion
 
@@ -104,10 +108,12 @@ runMultiThreadTest "Go" 2 10000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}
 
 "${CLEAN_COMPILE_JAVA}"
 runMultiThreadTest "Java" 2 10000 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+
+"${CLEAN_COMPILE_NODE_JS}"
+runMultiThreadTest "NodeJs" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 '
 
-runMultiThreadTest "Java" 2 2 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+runMultiThreadTest "NodeJs" 2 2 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 
-# "${CLEAN_COMPILE_NODE_JS}" # Shaked-TODO: uncomment
 # "${CLEAN_COMPILE_BUN}" # Shaked-TODO: uncomment
 #endregion
