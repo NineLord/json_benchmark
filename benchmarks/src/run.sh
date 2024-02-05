@@ -37,12 +37,14 @@ RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX @
 RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 GO_SINGLE_THREAD_CMD="./jsonTester" # Shaked-TODO
 GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
-JAVA_SINGLE_THREAD_CMD="mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
-JAVA_MULTI_THREAD_CMD="mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
+JAVA_SINGLE_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
+JAVA_MULTI_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
 NODE_SINGLE_THREAD_CMD="npm run start" # Shaked-TODO
 NODE_MULTI_THREAD_CMD="npm run start -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 BUN_SINGLE_THREAD_CMD="bun run start_bun" # Shaked-TODO
+BUN_SINGLE_THREAD_CMD_LIMIT="bun run start_bun_limit" # Shaked-TODO
 BUN_MULTI_THREAD_CMD="bun run start_bun -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 #endregion
 #endregion
 
@@ -53,29 +55,22 @@ runMultiThreadTest() {
     TEST_COUNTER="$3"
     EXEC_DIR="$4"
     EXEC_CMD="$5"
-    IS_SINGLE_THREAD_MODE="$6"
-
-    RUST_MODE=null
-    if [ "${IS_SINGLE_THREAD_MODE}" = true ]; then
-        RUST_MODE="s"
-    else
-        RUST_MODE="m"
-    fi
+    TEST_TYPE="$6"
 
     CONFIG_FILE="config_${CONFIG}"
     FULL_PATH_CONFIG="${INPUT_DIR}/${CONFIG_FILE}.json"
 
-    REPORT_FILE_NAME=null
-    if [ "${LANG}" = "Rust" ]; then
-        REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}${RUST_MODE}"
-    else
-        REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}"
+    FILE_EXTENTION=""
+    if [ "${TEST_TYPE}" != "" ]; then
+        FILE_EXTENTION="_${TEST_TYPE}"
+        TEST_TYPE="(${TEST_TYPE})"
     fi
+    REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}${FILE_EXTENTION}"
 
     FULL_PATH_CSV="${OUTPUT_DIR}/${REPORT_FILE_NAME}.csv"
     FULL_PATH_XLSX="${OUTPUT_DIR}/${REPORT_FILE_NAME}.xlsx"
 
-    echo "INFO :: Running ${LANG} Multi Thread Benchmark" >/dev/tty
+    echo "INFO :: Running ${LANG} Multi Thread Benchmark ${TEST_TYPE}" >/dev/tty
     "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
@@ -87,7 +82,7 @@ runMultiThreadTest() {
 
     kill "${RECORD_CPU_PID}"
 
-    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark" >/dev/tty
+    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark ${TEST_TYPE}" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
     # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
 }
@@ -102,8 +97,8 @@ mkdir -p "${OUTPUT_DIR}"
 #region Benchmark Rust
 : ' # Shaked-TODO: uncomment
 "${CLEAN_COMPILE_RUST}"
-runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" true
-runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}" false
+runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_GO}"
 runMultiThreadTest "Go" 2 10000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
@@ -116,9 +111,10 @@ runMultiThreadTest "NodeJs" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THR
 
 "${CLEAN_COMPILE_BUN}"
 runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 '
 
-runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 
 
 #endregion
