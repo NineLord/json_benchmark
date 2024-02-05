@@ -41,6 +41,8 @@ JAVA_SINGLE_THREAD_CMD="mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
 JAVA_MULTI_THREAD_CMD="mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
 NODE_SINGLE_THREAD_CMD="npm run start" # Shaked-TODO
 NODE_MULTI_THREAD_CMD="npm run start -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+BUN_SINGLE_THREAD_CMD="bun run start_bun" # Shaked-TODO
+BUN_MULTI_THREAD_CMD="bun run start_bun -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 #endregion
 #endregion
 
@@ -111,9 +113,12 @@ runMultiThreadTest "Java" 2 10000 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREA
 
 "${CLEAN_COMPILE_NODE_JS}"
 runMultiThreadTest "NodeJs" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+
+"${CLEAN_COMPILE_BUN}"
+runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 '
 
-runMultiThreadTest "NodeJs" 2 2 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 
-# "${CLEAN_COMPILE_BUN}" # Shaked-TODO: uncomment
+
 #endregion
