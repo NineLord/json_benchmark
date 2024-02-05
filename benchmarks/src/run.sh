@@ -60,17 +60,21 @@ runMultiThreadTest() {
     CONFIG_FILE="config_${CONFIG}"
     FULL_PATH_CONFIG="${INPUT_DIR}/${CONFIG_FILE}.json"
 
+    OUTPUT_DIR_NAME="normal"
     FILE_EXTENTION=""
     if [ "${TEST_TYPE}" != "" ]; then
+        OUTPUT_DIR_NAME="${TEST_TYPE}"
         FILE_EXTENTION="_${TEST_TYPE}"
-        TEST_TYPE="(${TEST_TYPE})"
+        TEST_TYPE=" - ${TEST_TYPE}"
     fi
     REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}${FILE_EXTENTION}"
 
-    FULL_PATH_CSV="${OUTPUT_DIR}/${REPORT_FILE_NAME}.csv"
-    FULL_PATH_XLSX="${OUTPUT_DIR}/${REPORT_FILE_NAME}.xlsx"
+    FULL_PATH_OUTPUT="${OUTPUT_DIR}/Multi/${LANG}/config_${CONFIG}/${OUTPUT_DIR_NAME}"
+    mkdir -p "${FULL_PATH_OUTPUT}"
+    FULL_PATH_CSV="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.csv"
+    FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
 
-    echo "INFO :: Running ${LANG} Multi Thread Benchmark ${TEST_TYPE}" >/dev/tty
+    echo "INFO :: Running ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
     "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
@@ -82,7 +86,7 @@ runMultiThreadTest() {
 
     kill "${RECORD_CPU_PID}"
 
-    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark ${TEST_TYPE}" >/dev/tty
+    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
     # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
 }
@@ -98,23 +102,47 @@ mkdir -p "${OUTPUT_DIR}"
 : ' # Shaked-TODO: uncomment
 "${CLEAN_COMPILE_RUST}"
 runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+runMultiThreadTest "Rust" 3 2000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+runMultiThreadTest "Rust" 4 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+runMultiThreadTest "Rust" 5 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+
 runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+runMultiThreadTest "Rust" 3 2000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+runMultiThreadTest "Rust" 4 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+runMultiThreadTest "Rust" 5 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_GO}"
 runMultiThreadTest "Go" 2 10000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
+runMultiThreadTest "Go" 3 2000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
+runMultiThreadTest "Go" 4 100 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
+runMultiThreadTest "Go" 5 100 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_JAVA}"
 runMultiThreadTest "Java" 2 10000 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+runMultiThreadTest "Java" 3 2000 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+runMultiThreadTest "Java" 4 100 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+runMultiThreadTest "Java" 5 100 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_NODE_JS}"
 runMultiThreadTest "NodeJs" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+runMultiThreadTest "NodeJs" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+runMultiThreadTest "NodeJs" 4 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+runMultiThreadTest "NodeJs" 5 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_BUN}"
 runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+runMultiThreadTest "Bun" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+
 runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+runMultiThreadTest "Bun" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 '
 
 runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
-
-
+runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
 #endregion
