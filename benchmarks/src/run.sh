@@ -13,6 +13,12 @@ CLEAR_WORKSHEETS_DIR=$(realpath "${UTILS_DIR}/ClearWorksheets")
 SUM_UP_RECORD_CPU_DIR=$(realpath "${UTILS_DIR}/SumUpRecordCpu")
 RECORD_CPU_DIR=$(realpath "${UTILS_DIR}/RecordCpu")
 TESTERS_DIR=$(realpath "${PROJECT_DIR}/../testers")
+RUST_SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/rust_json_benchmark/target/release")
+RUST_MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/rust_multi_json_benchmark/target/release")
+GO_SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/go_json_benchmark/bin")
+GO_MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/go_multi_json_benchmark/bin")
+JAVA_SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/java_json_benchmark")
+JAVA_MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/java_multi_json_benchmark")
 #endregion
 
 #region Files
@@ -24,10 +30,13 @@ CLEAN_COMPILE_BUN=$(realpath "${CLEAN_COMPILE_DIR}/bun.sh")
 
 RECORD_CPU=$(realpath "${RECORD_CPU_DIR}/record.sh")
 
-RUST_SINGLE_THREAD=$(realpath "${TESTERS_DIR}/rust_json_benchmark/target/release/json_tester")
-RUST_MULTI_THREAD=$(realpath "${TESTERS_DIR}/rust_multi_json_benchmark/target/release/json_tester")
-GO_SINGLE_THREAD=$(realpath "${TESTERS_DIR}/go_json_benchmark/bin/jsonTester")
-GO_MULTI_THREAD=$(realpath "${TESTERS_DIR}/go_multi_json_benchmark/bin/jsonTester")
+RUST_SINGLE_THREAD_CMD="./json_tester" # Shaked-TODO
+RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+GO_SINGLE_THREAD_CMD="./jsonTester" # Shaked-TODO
+GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+JAVA_SINGLE_THREAD_CMD="mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
+JAVA_MULTI_THREAD_CMD="mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
 #endregion
 #endregion
 
@@ -35,18 +44,16 @@ GO_MULTI_THREAD=$(realpath "${TESTERS_DIR}/go_multi_json_benchmark/bin/jsonTeste
 runMultiThreadTest() {
     LANG="$1"
     CONFIG="$2"
-    TESTER="$3"
-    TEST_COUNTER="$4"
-    IS_SINGLE_THREAD_MODE="$5"
+    TEST_COUNTER="$3"
+    EXEC_DIR="$4"
+    EXEC_CMD="$5"
+    IS_SINGLE_THREAD_MODE="$6"
 
     RUST_MODE=null
-    RUST_FLAG=null
     if [ "${IS_SINGLE_THREAD_MODE}" = true ]; then
         RUST_MODE="s"
-        RUST_FLAG="--single-thread"
     else
         RUST_MODE="m"
-        RUST_FLAG=""
     fi
 
     CONFIG_FILE="config_${CONFIG}"
@@ -66,11 +73,11 @@ runMultiThreadTest() {
     "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
-    if [ "${IS_SINGLE_THREAD_MODE}" = true ]; then
-        "${TESTER}" --single-thread -s "${FULL_PATH_XLSX}" "${FULL_PATH_CONFIG}" "${TEST_COUNTER}"
-    else
-        "${TESTER}" -s "${FULL_PATH_XLSX}" "${FULL_PATH_CONFIG}" "${TEST_COUNTER}"
-    fi
+    PREVIOUS_WORKING_DIR=$(pwd)
+    cd "${EXEC_DIR}"
+    EXEC=$(echo "${EXEC_CMD}" | sed -e 's/@FULL_PATH_XLSX/${FULL_PATH_XLSX}/g' -e 's/@FULL_PATH_CONFIG/${FULL_PATH_CONFIG}/g' -e 's/@TEST_COUNTER/${TEST_COUNTER}/g')
+    eval "${EXEC}" 1>/dev/null 2>/dev/null
+    cd "${PREVIOUS_WORKING_DIR}"
 
     kill "${RECORD_CPU_PID}"
 
@@ -89,13 +96,18 @@ mkdir -p "${OUTPUT_DIR}"
 #region Benchmark Rust
 : ' # Shaked-TODO: uncomment
 "${CLEAN_COMPILE_RUST}"
-runMultiThreadTest "Rust" 2 "${RUST_MULTI_THREAD}" 10000 true
+runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" true
+runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}" false
 
 "${CLEAN_COMPILE_GO}"
-runMultiThreadTest "Go" 2 "${GO_MULTI_THREAD}" 10000
+runMultiThreadTest "Go" 2 10000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
+
+"${CLEAN_COMPILE_JAVA}"
+runMultiThreadTest "Java" 2 10000 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 '
 
-# "${CLEAN_COMPILE_JAVA}" # Shaked-TODO: uncomment
+runMultiThreadTest "Java" 2 2 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+
 # "${CLEAN_COMPILE_NODE_JS}" # Shaked-TODO: uncomment
 # "${CLEAN_COMPILE_BUN}" # Shaked-TODO: uncomment
 #endregion
