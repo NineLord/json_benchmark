@@ -12,7 +12,7 @@ const PATH_TO_JSON_GENERATOR = resolve(__dirname, '../../testers/rust_json_bench
  * @return {string}
  */
 function generateJson(name, numberOfLetters, depth, numberOfChildren) {
-    const absolutePathToOutputFile = resolve(__dirname, `${name}Json_numberOfLetters${numberOfLetters}_depth${depth}_children${numberOfChildren}.json`);
+    const absolutePathToOutputFile = resolve(__dirname, `${name}Json_n${numberOfLetters}_d${depth}_m${numberOfChildren}.json`);
     const result = spawnSync(`${PATH_TO_JSON_GENERATOR} -n${numberOfLetters} -d${depth} -m${numberOfChildren} ${absolutePathToOutputFile}`, { shell: true });
 
     if (result.status !== 0)

@@ -32,6 +32,8 @@ CLEAN_COMPILE_BUN=$(realpath "${CLEAN_COMPILE_DIR}/bun.sh")
 
 RECORD_CPU=$(realpath "${RECORD_CPU_DIR}/record.sh")
 
+HUGE_JSON="hugeJson_n8_d10_m5"
+
 RUST_SINGLE_THREAD_CMD="./json_tester" # Shaked-TODO
 RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
@@ -39,10 +41,10 @@ GO_SINGLE_THREAD_CMD="./jsonTester" # Shaked-TODO
 GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 JAVA_SINGLE_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
 JAVA_MULTI_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
-NODE_SINGLE_THREAD_CMD="npm run start" # Shaked-TODO
+NODE_SINGLE_THREAD_CMD="npm run start -- @FULL_PATH_JSON @TEST_COUNTER -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL"
 NODE_MULTI_THREAD_CMD="npm run start -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
-BUN_SINGLE_THREAD_CMD="bun run start_bun" # Shaked-TODO
-BUN_SINGLE_THREAD_CMD_LIMIT="bun run start_bun_limit" # Shaked-TODO
+BUN_SINGLE_THREAD_CMD="bun run start_bun -- @FULL_PATH_JSON @TEST_COUNTER -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL"
+BUN_SINGLE_THREAD_CMD_LIMIT="bun run start_bun_limit -- @FULL_PATH_JSON @TEST_COUNTER -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL"
 BUN_MULTI_THREAD_CMD="bun run start_bun -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 #endregion
@@ -50,12 +52,12 @@ BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX @FULL_
 
 #region Helper methods
 runMultiThreadTest() {
-    LANG="$1"
-    CONFIG="$2"
-    TEST_COUNTER="$3"
-    EXEC_DIR="$4"
-    EXEC_CMD="$5"
-    TEST_TYPE="$6"
+    LANG="${1}"
+    CONFIG="${2}"
+    TEST_COUNTER="${3}"
+    EXEC_DIR="${4}"
+    EXEC_CMD="${5}"
+    TEST_TYPE="${6}"
 
     CONFIG_FILE="config_${CONFIG}"
     FULL_PATH_CONFIG="${INPUT_DIR}/${CONFIG_FILE}.json"
@@ -80,13 +82,70 @@ runMultiThreadTest() {
 
     PREVIOUS_WORKING_DIR=$(pwd)
     cd "${EXEC_DIR}"
-    EXEC=$(echo "${EXEC_CMD}" | sed -e 's/@FULL_PATH_XLSX/${FULL_PATH_XLSX}/g' -e 's/@FULL_PATH_CONFIG/${FULL_PATH_CONFIG}/g' -e 's/@TEST_COUNTER/${TEST_COUNTER}/g')
+    EXEC=$(echo "${EXEC_CMD}" | sed \
+        -e 's/@FULL_PATH_XLSX/${FULL_PATH_XLSX}/g' \
+        -e 's/@FULL_PATH_CONFIG/${FULL_PATH_CONFIG}/g' \
+        -e 's/@TEST_COUNTER/${TEST_COUNTER}/g' \
+    )
     eval "${EXEC}" 1>/dev/null 2>/dev/null
     cd "${PREVIOUS_WORKING_DIR}"
 
     kill "${RECORD_CPU_PID}"
 
     echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
+    node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
+    # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
+}
+
+runSingleThreadTest() {
+    LANG="${1}"
+    JSON_FILE="${2}"
+    TEST_COUNTER="${3}"
+    NUMBER_OF_LETTERS="${4}"
+    DEPTH="${5}"
+    NUMBER_OF_CHILDREN="${6}"
+    SAMPLING_INTERVAL="${7}"
+    EXEC_DIR="${8}"
+    EXEC_CMD="${9}"
+    TEST_TYPE="${10}"
+
+    FULL_PATH_JSON="${INPUT_DIR}/${JSON_FILE}.json"
+
+    OUTPUT_DIR_NAME="normal"
+    FILE_EXTENTION=""
+    if [ "${TEST_TYPE}" != "" ]; then
+        OUTPUT_DIR_NAME="${TEST_TYPE}"
+        FILE_EXTENTION="_${TEST_TYPE}"
+        TEST_TYPE=" - ${TEST_TYPE}"
+    fi
+    REPORT_FILE_NAME="report_${LANG}_${JSON_FILE}${FILE_EXTENTION}"
+
+    FULL_PATH_OUTPUT="${OUTPUT_DIR}/Single/${LANG}/${JSON_FILE}/${OUTPUT_DIR_NAME}"
+    mkdir -p "${FULL_PATH_OUTPUT}"
+    FULL_PATH_CSV="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.csv"
+    FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
+
+    echo "INFO :: Running ${LANG} Single Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
+    "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
+    RECORD_CPU_PID=$!
+
+    PREVIOUS_WORKING_DIR=$(pwd)
+    cd "${EXEC_DIR}"
+    EXEC=$(echo "${EXEC_CMD}" | sed \
+        -e 's/@FULL_PATH_JSON/${FULL_PATH_JSON}/g' \
+        -e 's/@TEST_COUNTER/${TEST_COUNTER}/g' \
+        -e 's/@FULL_PATH_XLSX/${FULL_PATH_XLSX}/g' \
+        -e 's/@NUMBER_OF_LETTERS/${NUMBER_OF_LETTERS}/g' \
+        -e 's/@DEPTH/${DEPTH}/g' \
+        -e 's/@NUMBER_OF_CHILDREN/${NUMBER_OF_CHILDREN}/g' \
+        -e 's/@SAMPLING_INTERVAL/${SAMPLING_INTERVAL}/g' \
+    )
+    eval "${EXEC}" 1>/dev/null 2>/dev/null
+    cd "${PREVIOUS_WORKING_DIR}"
+
+    kill "${RECORD_CPU_PID}"
+
+    echo "INFO :: Fixing up report files for ${LANG} Single Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
     # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
 }
@@ -124,25 +183,37 @@ runMultiThreadTest "Java" 4 100 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_
 runMultiThreadTest "Java" 5 100 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_NODE_JS}"
+runSingleThreadTest "NodeJs" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
 runMultiThreadTest "NodeJs" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 runMultiThreadTest "NodeJs" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 runMultiThreadTest "NodeJs" 4 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 runMultiThreadTest "NodeJs" 5 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_BUN}"
+runSingleThreadTest "Bun" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
 runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 runMultiThreadTest "Bun" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 
+runSingleThreadTest "Bun" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
 runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 runMultiThreadTest "Bun" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 '
 
-runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
-runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
-runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
-runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+# runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+# runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+# runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+# runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+
+# "${CLEAN_COMPILE_BUN}"
+# runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+# runMultiThreadTest "Bun" 3 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+# runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+# runMultiThreadTest "Bun" 3 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+
+#runSingleThreadTest "NodeJs" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
+#runSingleThreadTest "Bun" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
 #endregion
