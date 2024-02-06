@@ -37,7 +37,7 @@ HUGE_JSON="hugeJson_n8_d10_m5"
 RUST_SINGLE_THREAD_CMD="./json_tester" # Shaked-TODO
 RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
-GO_SINGLE_THREAD_CMD="./jsonTester" # Shaked-TODO
+GO_SINGLE_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL @FULL_PATH_JSON @TEST_COUNTER"
 GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 JAVA_SINGLE_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
 JAVA_MULTI_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
@@ -171,6 +171,7 @@ runMultiThreadTest "Rust" 4 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_
 runMultiThreadTest "Rust" 5 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 
 "${CLEAN_COMPILE_GO}"
+runSingleThreadTest "Go" "${HUGE_JSON}" 5 8 10 5 10 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
 runMultiThreadTest "Go" 2 10000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
 runMultiThreadTest "Go" 3 2000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
 runMultiThreadTest "Go" 4 100 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
@@ -189,6 +190,7 @@ runMultiThreadTest "NodeJs" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THRE
 runMultiThreadTest "NodeJs" 4 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 runMultiThreadTest "NodeJs" 5 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 
+# Shaked-TODO: bun cant use worker_threads/workerpool, need to change the tests to support them.
 "${CLEAN_COMPILE_BUN}"
 runSingleThreadTest "Bun" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
 runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
@@ -215,5 +217,5 @@ runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CM
 # runMultiThreadTest "Bun" 3 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 
 #runSingleThreadTest "NodeJs" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
-#runSingleThreadTest "Bun" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
+runSingleThreadTest "Go" "smallJson_n8_d3_m8" 2 2 2 2 50 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
 #endregion
