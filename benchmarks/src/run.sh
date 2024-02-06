@@ -37,7 +37,7 @@ HUGE_JSON="hugeJson_n8_d10_m5"
 RUST_SINGLE_THREAD_CMD="./json_tester" # Shaked-TODO
 RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
-GO_SINGLE_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL @FULL_PATH_JSON @TEST_COUNTER"
+GO_SINGLE_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX -n @NUMBER_OF_LETTERS -d @DEPTH -m @NUMBER_OF_CHILDREN -i @SAMPLING_INTERVAL @FULL_PATH_JSON @TEST_COUNTER"
 GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 JAVA_SINGLE_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"\"" # Shaked-TODO
 JAVA_MULTI_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
@@ -51,52 +51,6 @@ BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX @FULL_
 #endregion
 
 #region Helper methods
-runMultiThreadTest() {
-    LANG="${1}"
-    CONFIG="${2}"
-    TEST_COUNTER="${3}"
-    EXEC_DIR="${4}"
-    EXEC_CMD="${5}"
-    TEST_TYPE="${6}"
-
-    CONFIG_FILE="config_${CONFIG}"
-    FULL_PATH_CONFIG="${INPUT_DIR}/${CONFIG_FILE}.json"
-
-    OUTPUT_DIR_NAME="normal"
-    FILE_EXTENTION=""
-    if [ "${TEST_TYPE}" != "" ]; then
-        OUTPUT_DIR_NAME="${TEST_TYPE}"
-        FILE_EXTENTION="_${TEST_TYPE}"
-        TEST_TYPE=" - ${TEST_TYPE}"
-    fi
-    REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}${FILE_EXTENTION}"
-
-    FULL_PATH_OUTPUT="${OUTPUT_DIR}/Multi/${LANG}/config_${CONFIG}/${OUTPUT_DIR_NAME}"
-    mkdir -p "${FULL_PATH_OUTPUT}"
-    FULL_PATH_CSV="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.csv"
-    FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
-
-    echo "INFO :: Running ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
-    "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
-    RECORD_CPU_PID=$!
-
-    PREVIOUS_WORKING_DIR=$(pwd)
-    cd "${EXEC_DIR}"
-    EXEC=$(echo "${EXEC_CMD}" | sed \
-        -e 's/@FULL_PATH_XLSX/${FULL_PATH_XLSX}/g' \
-        -e 's/@FULL_PATH_CONFIG/${FULL_PATH_CONFIG}/g' \
-        -e 's/@TEST_COUNTER/${TEST_COUNTER}/g' \
-    )
-    eval "${EXEC}" 1>/dev/null 2>/dev/null
-    cd "${PREVIOUS_WORKING_DIR}"
-
-    kill "${RECORD_CPU_PID}"
-
-    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
-    node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
-    # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
-}
-
 runSingleThreadTest() {
     LANG="${1}"
     JSON_FILE="${2}"
@@ -146,6 +100,52 @@ runSingleThreadTest() {
     kill "${RECORD_CPU_PID}"
 
     echo "INFO :: Fixing up report files for ${LANG} Single Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
+    node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
+    # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
+}
+
+runMultiThreadTest() {
+    LANG="${1}"
+    CONFIG="${2}"
+    TEST_COUNTER="${3}"
+    EXEC_DIR="${4}"
+    EXEC_CMD="${5}"
+    TEST_TYPE="${6}"
+
+    CONFIG_FILE="config_${CONFIG}"
+    FULL_PATH_CONFIG="${INPUT_DIR}/${CONFIG_FILE}.json"
+
+    OUTPUT_DIR_NAME="normal"
+    FILE_EXTENTION=""
+    if [ "${TEST_TYPE}" != "" ]; then
+        OUTPUT_DIR_NAME="${TEST_TYPE}"
+        FILE_EXTENTION="_${TEST_TYPE}"
+        TEST_TYPE=" - ${TEST_TYPE}"
+    fi
+    REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}${FILE_EXTENTION}"
+
+    FULL_PATH_OUTPUT="${OUTPUT_DIR}/Multi/${LANG}/config_${CONFIG}/${OUTPUT_DIR_NAME}"
+    mkdir -p "${FULL_PATH_OUTPUT}"
+    FULL_PATH_CSV="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.csv"
+    FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
+
+    echo "INFO :: Running ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
+    "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
+    RECORD_CPU_PID=$!
+
+    PREVIOUS_WORKING_DIR=$(pwd)
+    cd "${EXEC_DIR}"
+    EXEC=$(echo "${EXEC_CMD}" | sed \
+        -e 's/@FULL_PATH_XLSX/${FULL_PATH_XLSX}/g' \
+        -e 's/@FULL_PATH_CONFIG/${FULL_PATH_CONFIG}/g' \
+        -e 's/@TEST_COUNTER/${TEST_COUNTER}/g' \
+    )
+    eval "${EXEC}" 1>/dev/null 2>/dev/null
+    cd "${PREVIOUS_WORKING_DIR}"
+
+    kill "${RECORD_CPU_PID}"
+
+    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
     # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
 }
