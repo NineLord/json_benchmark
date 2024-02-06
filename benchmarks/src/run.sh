@@ -34,7 +34,7 @@ RECORD_CPU=$(realpath "${RECORD_CPU_DIR}/record.sh")
 
 HUGE_JSON="hugeJson_n8_d10_m5"
 
-RUST_SINGLE_THREAD_CMD="./json_tester" # Shaked-TODO
+RUST_SINGLE_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX -n@NUMBER_OF_LETTERS -d@DEPTH -m@NUMBER_OF_CHILDREN -i@SAMPLING_INTERVAL @FULL_PATH_JSON @TEST_COUNTER"
 RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 GO_SINGLE_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX -n @NUMBER_OF_LETTERS -d @DEPTH -m @NUMBER_OF_CHILDREN -i @SAMPLING_INTERVAL @FULL_PATH_JSON @TEST_COUNTER"
@@ -160,6 +160,7 @@ mkdir -p "${OUTPUT_DIR}"
 #region Benchmark Rust
 : ' # Shaked-TODO: uncomment
 "${CLEAN_COMPILE_RUST}"
+runSingleThreadTest "Rust" "${HUGE_JSON}" 5 8 10 5 10 "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
 runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
 runMultiThreadTest "Rust" 3 2000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
 runMultiThreadTest "Rust" 4 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
@@ -216,6 +217,7 @@ runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CM
 # runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 # runMultiThreadTest "Bun" 3 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 
-#runSingleThreadTest "NodeJs" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
-runSingleThreadTest "Go" "smallJson_n8_d3_m8" 2 2 2 2 50 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
+# runSingleThreadTest "NodeJs" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
+# runSingleThreadTest "Go" "smallJson_n8_d3_m8" 2 2 2 2 50 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
+runSingleThreadTest "Rust" "smallJson_n8_d3_m8" 2 2 2 2 50 "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
 #endregion
