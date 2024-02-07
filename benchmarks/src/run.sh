@@ -103,7 +103,7 @@ runSingleThreadTest() {
 
     echo "INFO :: Fixing up report files for ${LANG} Single Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
-    # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
+    node "${SUM_UP_RECORD_CPU_DIR}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 1>/dev/null 2>/dev/null
 }
 
 runMultiThreadTest() {
@@ -132,7 +132,7 @@ runMultiThreadTest() {
     FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
 
     echo "INFO :: Running ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
-    "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
+    "${RECORD_CPU}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
     PREVIOUS_WORKING_DIR=$(pwd)
@@ -149,7 +149,7 @@ runMultiThreadTest() {
 
     echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
-    # node "${SUM_UP_RECORD_CPU_DIR}" 1>/dev/null 2>/dev/null # Shaked-TODO
+    node "${SUM_UP_RECORD_CPU_DIR}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 1>/dev/null 2>/dev/null
 }
 #endregion
 
@@ -209,7 +209,7 @@ runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CM
 runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 '
 
-# runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 # runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 # runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
 # runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"

@@ -10,4 +10,5 @@
 /benchmarks/input/*.json
 /benchmarks/output
 /benchmarks/src/Utils/ClearWorksheets/node_modules
+/benchmarks/src/Utils/SumUpRecordCpu/node_modules
 .vscode
