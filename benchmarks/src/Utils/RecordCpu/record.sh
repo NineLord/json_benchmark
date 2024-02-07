@@ -16,7 +16,11 @@ if [ -z "$filePath" ]; then
 fi
 
 rm -rf "$filePath"
-echo -e "CPU Average:,\nCPU Average (out of $intNumberOfCores%):,\nRAM Average (MB):,\nSwp Average (MB):,\n,\nCore 1,Core 2,Core 3, Core 4, Sum Cores, Avg Cores, RAM Used (MB), Total RAM, Swp Used (MB), Total Swp," > "$filePath"
+echo -en "CPU Average:,\nCPU Average (out of $intNumberOfCores%):,\nRAM Average (MB):,\nSwp Average (MB):,\n,\n" > "$filePath"
+for ((index=1; index<="${numberOfCores}"; index++)); do
+    echo -en "Core ${index}," >> "$filePath"
+done
+echo -e "Sum Cores,Avg Cores,RAM Used (MB),Total RAM,Swp Used (MB),Total Swp," >> "$filePath"
 
 echo "Starting to run!"
 while true; do

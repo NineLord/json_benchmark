@@ -48,6 +48,8 @@ BUN_SINGLE_THREAD_CMD_LIMIT="bun run start_bun_limit -- @FULL_PATH_JSON @TEST_CO
 BUN_MULTI_THREAD_CMD="bun run start_bun -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
 #endregion
+
+NUMBER_OF_CORES=16
 #endregion
 
 #region Helper methods
@@ -80,7 +82,7 @@ runSingleThreadTest() {
     FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
 
     echo "INFO :: Running ${LANG} Single Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
-    "${RECORD_CPU}" "${FULL_PATH_CSV}" 0>/dev/null 1>/dev/null 2>/dev/null &
+    "${RECORD_CPU}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
     PREVIOUS_WORKING_DIR=$(pwd)
@@ -220,6 +222,6 @@ runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CM
 
 # runSingleThreadTest "NodeJs" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
 # runSingleThreadTest "Go" "smallJson_n8_d3_m8" 2 2 2 2 50 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
-# runSingleThreadTest "Rust" "smallJson_n8_d3_m8" 2 2 2 2 50 "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
+runSingleThreadTest "Rust" "smallJson_n8_d3_m8" 2 8 8 6 50 "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
 # runSingleThreadTest "Java" "smallJson_n8_d3_m8" 2 2 2 2 50 "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
 #endregion

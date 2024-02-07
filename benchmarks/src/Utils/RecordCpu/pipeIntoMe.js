@@ -1,5 +1,7 @@
 #!/usr/local/bin/node
 
+const bashColorsRegex = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+
 const numbersRegex = "(\\d)+";
 const percentageRegex = new RegExp(`${numbersRegex}\\.${numbersRegex}%`);
 
@@ -83,6 +85,7 @@ function appendRam(data, finalResult) {
  * @param {number} numberOfCores The number of cores expected to have.
  */
 function main(data, numberOfCores) {
+	data = data.replace(bashColorsRegex, '');
 	let result = [];
 
 	//#region Get CPU Usage
