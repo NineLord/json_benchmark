@@ -8,20 +8,24 @@ TESTERS_DIR=$(realpath "${SCRIPT_DIR}/../../../../testers")
 SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/node_json_benchmark")
 MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/node_multi_json_benchmark")
 #endregion
+
+RED="\e[31m"
+GREEN="\e[32m"
+ENDCOLOR="\e[0m"
 #endregion
 
-echo "INFO :: Cleaning NodeJs Single Thread Compiled Data"
+echo -e "INFO :: Cleaning ${RED}NodeJs${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
 cd "${SINGLE_THREAD_DIR}"
 rm -rf node_modules
 
-echo "INFO :: Cleaning NodeJs Multi Thread Compiled Data"
+echo -e "INFO :: Cleaning ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
 cd "${MULTI_THREAD_DIR}"
 rm -rf node_modules
 
-echo "INFO :: Compling NodeJs Single Thread"
+echo -e "INFO :: Compling ${RED}NodeJs${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
 cd "${SINGLE_THREAD_DIR}"
 npm install --omit=dev
 
-echo "INFO :: Compling NodeJs Multi Thread"
+echo -e "INFO :: Compling ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 npm install --omit=dev

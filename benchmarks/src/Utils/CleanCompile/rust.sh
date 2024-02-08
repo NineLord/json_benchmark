@@ -8,20 +8,24 @@ TESTERS_DIR=$(realpath "${SCRIPT_DIR}/../../../../testers")
 SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/rust_json_benchmark")
 MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/rust_multi_json_benchmark")
 #endregion
+
+RED="\e[31m"
+GREEN="\e[32m"
+ENDCOLOR="\e[0m"
 #endregion
 
-echo "INFO :: Cleaning Rust Single Thread Compiled Data"
+echo -e "INFO :: Cleaning ${RED}Rust${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
 cd "${SINGLE_THREAD_DIR}"
 cargo clean
 
-echo "INFO :: Cleaning Rust Multi Thread Compiled Data"
+echo -e "INFO :: Cleaning ${RED}Rust${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
 cd "${MULTI_THREAD_DIR}"
 cargo clean
 
-echo "INFO :: Compling Rust Single Thread"
+echo -e "INFO :: Compling ${RED}Rust${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
 cd "${SINGLE_THREAD_DIR}"
 cargo build --bin json_tester --release
 
-echo "INFO :: Compling Rust Multi Thread"
+echo -e "INFO :: Compling ${RED}Rust${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 cargo build --bin json_tester --release
