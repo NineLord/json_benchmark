@@ -35,21 +35,27 @@ RECORD_CPU=$(realpath "${RECORD_CPU_DIR}/record.sh")
 HUGE_JSON="hugeJson_n8_d10_m5"
 
 RUST_SINGLE_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX -n@NUMBER_OF_LETTERS -d@DEPTH -m@NUMBER_OF_CHILDREN -i@SAMPLING_INTERVAL @FULL_PATH_JSON @TEST_COUNTER"
-RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
-RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+RUST_MULTI_THREAD_CMD_SINGLE="./json_tester --single-thread -s @FULL_PATH_XLSX -t @NUMBER_OF_THREADS @FULL_PATH_CONFIG @TEST_COUNTER"
+RUST_MULTI_THREAD_CMD="./json_tester -s @FULL_PATH_XLSX -t @NUMBER_OF_THREADS @FULL_PATH_CONFIG @TEST_COUNTER"
 GO_SINGLE_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX -n @NUMBER_OF_LETTERS -d @DEPTH -m @NUMBER_OF_CHILDREN -i @SAMPLING_INTERVAL @FULL_PATH_JSON @TEST_COUNTER"
-GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+GO_MULTI_THREAD_CMD="./jsonTester -s @FULL_PATH_XLSX -t @NUMBER_OF_THREADS @FULL_PATH_CONFIG @TEST_COUNTER"
 JAVA_SINGLE_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"@FULL_PATH_JSON @TEST_COUNTER @FULL_PATH_XLSX @NUMBER_OF_LETTERS @DEPTH @NUMBER_OF_CHILDREN @SAMPLING_INTERVAL\""
-JAVA_MULTI_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER\""
+JAVA_MULTI_THREAD_CMD="MAVEN_OPTS=\"-Xmx8G -Xms16M -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20\" mvn exec:java -Dexec.args=\"-s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER @NUMBER_OF_THREADS\""
 NODE_SINGLE_THREAD_CMD="npm run start -- @FULL_PATH_JSON @TEST_COUNTER -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL"
-NODE_MULTI_THREAD_CMD="npm run start -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+NODE_MULTI_THREAD_CMD="npm run start -- -s @FULL_PATH_XLSX -t @NUMBER_OF_THREADS @FULL_PATH_CONFIG @TEST_COUNTER"
 BUN_SINGLE_THREAD_CMD="bun run start_bun -- @FULL_PATH_JSON @TEST_COUNTER -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL"
 BUN_SINGLE_THREAD_CMD_LIMIT="bun run start_bun_limit -- @FULL_PATH_JSON @TEST_COUNTER -s @FULL_PATH_XLSX -n=@NUMBER_OF_LETTERS -d=@DEPTH -m=@NUMBER_OF_CHILDREN -i=@SAMPLING_INTERVAL"
-BUN_MULTI_THREAD_CMD="bun run start_bun -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
-BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX @FULL_PATH_CONFIG @TEST_COUNTER"
+BUN_MULTI_THREAD_CMD="bun run start_bun -- -s @FULL_PATH_XLSX -t @NUMBER_OF_THREADS @FULL_PATH_CONFIG @TEST_COUNTER"
+BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX -t @NUMBER_OF_THREADS @FULL_PATH_CONFIG @TEST_COUNTER"
 #endregion
 
+RED="\e[31m"
+GREEN="\e[32m"
+CYAN="\e[36m"
+ENDCOLOR="\e[0m"
+
 NUMBER_OF_CORES=16
+NUMBER_OF_THREADS=15
 #endregion
 
 #region Helper methods
@@ -72,7 +78,7 @@ runSingleThreadTest() {
     if [ "${TEST_TYPE}" != "" ]; then
         OUTPUT_DIR_NAME="${TEST_TYPE}"
         FILE_EXTENTION="_${TEST_TYPE}"
-        TEST_TYPE=" - ${TEST_TYPE}"
+        TEST_TYPE=" - ${CYAN}${TEST_TYPE}${ENDCOLOR}"
     fi
     REPORT_FILE_NAME="report_${LANG}_${JSON_FILE}${FILE_EXTENTION}"
 
@@ -81,7 +87,7 @@ runSingleThreadTest() {
     FULL_PATH_CSV="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.csv"
     FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
 
-    echo "INFO :: Running ${LANG} Single Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
+    echo -e "INFO :: Running ${RED}${LANG}${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
     "${RECORD_CPU}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
@@ -101,7 +107,7 @@ runSingleThreadTest() {
 
     kill "${RECORD_CPU_PID}"
 
-    echo "INFO :: Fixing up report files for ${LANG} Single Thread Benchmark${TEST_TYPE} - json=${JSON_FILE} - testCounter=${TEST_COUNTER} - letters=${NUMBER_OF_LETTERS} - depth=${DEPTH} - children=${NUMBER_OF_CHILDREN} - interval=${SAMPLING_INTERVAL}" >/dev/tty
+    echo "INFO :: Fixing up report files" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
     node "${SUM_UP_RECORD_CPU_DIR}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 1>/dev/null 2>/dev/null
 }
@@ -122,7 +128,7 @@ runMultiThreadTest() {
     if [ "${TEST_TYPE}" != "" ]; then
         OUTPUT_DIR_NAME="${TEST_TYPE}"
         FILE_EXTENTION="_${TEST_TYPE}"
-        TEST_TYPE=" - ${TEST_TYPE}"
+        TEST_TYPE=" - ${CYAN}${TEST_TYPE}${ENDCOLOR}"
     fi
     REPORT_FILE_NAME="report_${LANG}_${CONFIG_FILE}${FILE_EXTENTION}"
 
@@ -131,7 +137,7 @@ runMultiThreadTest() {
     FULL_PATH_CSV="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.csv"
     FULL_PATH_XLSX="${FULL_PATH_OUTPUT}/${REPORT_FILE_NAME}.xlsx"
 
-    echo "INFO :: Running ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
+    echo -e "INFO :: Running ${RED}${LANG}${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
     "${RECORD_CPU}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 0>/dev/null 1>/dev/null 2>/dev/null &
     RECORD_CPU_PID=$!
 
@@ -141,13 +147,14 @@ runMultiThreadTest() {
         -e 's/@FULL_PATH_XLSX/${FULL_PATH_XLSX}/g' \
         -e 's/@FULL_PATH_CONFIG/${FULL_PATH_CONFIG}/g' \
         -e 's/@TEST_COUNTER/${TEST_COUNTER}/g' \
+        -e 's/@NUMBER_OF_THREADS/${NUMBER_OF_THREADS}/g' \
     )
     eval "${EXEC}" 1>/dev/null 2>/dev/null
     cd "${PREVIOUS_WORKING_DIR}"
 
     kill "${RECORD_CPU_PID}"
 
-    echo "INFO :: Fixing up report files for ${LANG} Multi Thread Benchmark${TEST_TYPE} - config=${CONFIG} - testCounter=${TEST_COUNTER}" >/dev/tty
+    echo "INFO :: Fixing up report files" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
     node "${SUM_UP_RECORD_CPU_DIR}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 1>/dev/null 2>/dev/null
 }
@@ -209,19 +216,21 @@ runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CM
 runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 '
 
-runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+# runSingleThreadTest "Rust" "smallJson_n8_d3_m8" 2 2 2 2 50 "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
 # runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
-# runMultiThreadTest "Rust" 3 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+# runMultiThreadTest "Rust" 2 2 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 
-# "${CLEAN_COMPILE_BUN}"
-# runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Bun" 3 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
-# runMultiThreadTest "Bun" 3 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+# runSingleThreadTest "Go" "smallJson_n8_d3_m8" 2 2 2 2 50 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
+# runMultiThreadTest "Go" 2 2 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
+
+# runSingleThreadTest "Java" "smallJson_n8_d3_m8" 2 2 2 2 50 "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
+# runMultiThreadTest "Java" 2 2 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
 # runSingleThreadTest "NodeJs" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
-# runSingleThreadTest "Go" "smallJson_n8_d3_m8" 2 2 2 2 50 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
-runSingleThreadTest "Rust" "smallJson_n8_d3_m8" 2 8 8 6 50 "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
-# runSingleThreadTest "Java" "smallJson_n8_d3_m8" 2 2 2 2 50 "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
+# runMultiThreadTest "NodeJs" 2 2 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+
+# runSingleThreadTest "Bun" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
+# runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+runSingleThreadTest "Bun" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
+# runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 #endregion
