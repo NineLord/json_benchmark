@@ -226,9 +226,11 @@ runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CM
 # runSingleThreadTest "Java" "smallJson_n8_d3_m8" 2 2 2 2 50 "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
 # runMultiThreadTest "Java" 2 2 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
+# "${CLEAN_COMPILE_NODE_JS}"
 # runSingleThreadTest "NodeJs" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
 # runMultiThreadTest "NodeJs" 2 2 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 
+#"${CLEAN_COMPILE_BUN}"
 # runSingleThreadTest "Bun" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
 # runMultiThreadTest "Bun" 2 2 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 runSingleThreadTest "Bun" "smallJson_n8_d3_m8" 2 2 2 2 50 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
