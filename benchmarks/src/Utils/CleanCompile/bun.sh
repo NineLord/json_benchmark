@@ -34,3 +34,5 @@ echo -e "INFO :: Compling ${RED}Bun${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 bun install --production
 find ./node_modules/unzipper/lib -name "*.js" -exec sed -i -e "s/var Promise = require('bluebird');//g" {} \;
+
+# Shaked-TODO: add cleaning bun_node_modules

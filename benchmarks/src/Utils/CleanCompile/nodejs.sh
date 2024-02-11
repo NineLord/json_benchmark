@@ -29,3 +29,5 @@ npm install --omit=dev
 echo -e "INFO :: Compling ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 npm install --omit=dev
+
+# Shaked-TODO: add cleaning bun_node_modules
