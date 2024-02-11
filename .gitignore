@@ -12,3 +12,5 @@
 /benchmarks/src/Utils/ClearWorksheets/node_modules
 /benchmarks/src/Utils/SumUpRecordCpu/node_modules
 .vscode
+/benchmarks/src/Utils/ClearWorksheets/package-lock.json
+/benchmarks/src/Utils/SumUpRecordCpu/package-lock.json
