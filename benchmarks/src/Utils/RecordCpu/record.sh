@@ -16,7 +16,7 @@ if [ -z "$filePath" ]; then
 fi
 
 rm -rf "$filePath"
-echo -en "CPU Average:,\nCPU Average (out of $intNumberOfCores%):,\nRAM Average (MB):,\nSwp Average (MB):,\n,\n" > "$filePath"
+echo -en "CPU Average:,,CPU Maximum:,,CPU Minimum:,\nCPU Average (out of $intNumberOfCores%):,,CPU Maximum (out of $intNumberOfCores%):,,CPU Minimum (out of $intNumberOfCores%):,\nRAM Average (MB):,,RAM Maximum (MB):,,RAM Minimum (MB):,\nSwp Average (MB):,,Swp Maximum (MB):,,Swp Minimum (MB):,\n,\n" > "$filePath"
 for ((index=1; index<="${numberOfCores}"; index++)); do
     echo -en "Core ${index}," >> "$filePath"
 done

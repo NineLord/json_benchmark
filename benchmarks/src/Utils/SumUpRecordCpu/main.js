@@ -41,10 +41,17 @@ function getNumber(row, index) {
  */
 function sumUp(worksheet, numberOfCores) {
 	let cpuSum = 0;
+	let cpuMaximum = null;
+	let cpuMinimum = null;
 	let cpuSumOutOfAll = 0;
+	let cpuSumOutOfAllMaximum = null;
+	let cpuSumOutOfAllMinimum = null;
 	let ramSum = 0;
+	let ramSumMaximum = null;
+	let ramSumMinimum = null;
 	let swpSum = 0;
-	
+	let swpSumMaximum = null;
+	let swpSumMinimum = null;
 
 	let numberOfRows = 0;
 	const dataRows = worksheet.getRows(7, worksheet.lastRow.number);
@@ -72,24 +79,48 @@ function sumUp(worksheet, numberOfCores) {
 
 		++numberOfRows;
 		cpuSum += average;
+		cpuMaximum = cpuMaximum === null ? average : Math.max(cpuMaximum, average);
+		cpuMinimum = cpuMinimum === null ? average : Math.min(cpuMinimum, average);
 		ramSum += ram;
+		ramSumMaximum = ramSumMaximum === null ? ram : Math.max(ramSumMaximum, ram);
+		ramSumMinimum = ramSumMinimum === null ? ram : Math.min(ramSumMinimum, ram);
 		swpSum += swp;
+		swpSumMaximum = swpSumMaximum === null ? swp : Math.max(swpSumMaximum, swp);
+		swpSumMinimum = swpSumMinimum === null ? swp : Math.min(swpSumMinimum, swp);
 		row.getCell(numberOfCores + 1).value = `${sumAverageCores}%`;
 		cpuSumOutOfAll += sumAverageCores;
+		cpuSumOutOfAllMaximum = cpuSumOutOfAllMaximum === null ? sumAverageCores : Math.max(cpuSumOutOfAllMaximum, sumAverageCores);
+		cpuSumOutOfAllMinimum = cpuSumOutOfAllMinimum === null ? sumAverageCores : Math.min(cpuSumOutOfAllMinimum, sumAverageCores);
 	});
 
 
 	const cpuAverageCell = worksheet.getRow(1).getCell(2);
 	cpuAverageCell.value = cpuSum / numberOfRows;
+	const cpuMaximumCell = worksheet.getRow(1).getCell(4);
+	cpuMaximumCell.value = cpuMaximum;
+	const cpuMinimumCell = worksheet.getRow(1).getCell(6);
+	cpuMinimumCell.value = cpuMinimum;
 
 	const cpuAverageOutOfAllCell = worksheet.getRow(2).getCell(2);
 	cpuAverageOutOfAllCell.value = cpuSumOutOfAll / numberOfRows;
+	const cpuMaximumOutOfAllCell = worksheet.getRow(2).getCell(4);
+	cpuMaximumOutOfAllCell.value = cpuSumOutOfAllMaximum / numberOfCores;
+	const cpuMinimumOutOfAllCell = worksheet.getRow(2).getCell(6);
+	cpuMinimumOutOfAllCell.value = cpuSumOutOfAllMinimum / numberOfCores;
 
 	const ramAverageCell = worksheet.getRow(3).getCell(2);
 	ramAverageCell.value = ramSum / numberOfRows;
+	const ramMaximumCell = worksheet.getRow(3).getCell(4);
+	ramMaximumCell.value = ramSumMaximum;
+	const ramMinimumCell = worksheet.getRow(3).getCell(6);
+	ramMinimumCell.value = ramSumMinimum;
 
 	const swpAverageCell = worksheet.getRow(4).getCell(2);
 	swpAverageCell.value = swpSum / numberOfRows;
+	const swpMaximumCell = worksheet.getRow(4).getCell(4);
+	swpMaximumCell.value = swpSumMaximum;
+	const swpMinimumCell = worksheet.getRow(4).getCell(6);
+	swpMinimumCell.value = swpSumMinimum;
 }
 
 /**
