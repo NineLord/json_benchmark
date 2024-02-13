@@ -7,7 +7,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 TESTERS_DIR=$(realpath "${SCRIPT_DIR}/../../../../testers")
 SINGLE_THREAD_DIR=$(realpath "${TESTERS_DIR}/java_json_benchmark")
 MULTI_THREAD_DIR=$(realpath "${TESTERS_DIR}/java_multi_json_benchmark")
-MAVEN_LOCAL_REPOSITORY=$(realpath "~/.m2")
+MAVEN_LOCAL_REPOSITORY=$(realpath -m "~/.m2")
 #endregion
 
 RED="\e[31m"
