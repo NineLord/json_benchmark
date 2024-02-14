@@ -36,13 +36,13 @@ rm -f "${NODE_MULTI_LOCK_FILE}"
 # To make sure bluebird is remove:
 # grep -rwn --color=always --exclude-dir="bluebird" bluebird . | grep require -C 1000
 
-echo -e "INFO :: Compling ${RED}Bun${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}Bun${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
 cd "${SINGLE_THREAD_DIR}"
 bun install
 bun install --production
 find ./node_modules/unzipper/lib -name "*.js" -exec sed -i -e "s/var Promise = require('bluebird');//g" {} \;
 
-echo -e "INFO :: Compling ${RED}Bun${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}Bun${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 bun install
 bun install --production

@@ -14,18 +14,18 @@ GREEN="\e[32m"
 ENDCOLOR="\e[0m"
 #endregion
 
-echo -e "INFO :: Cleaning ${RED}Go${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
+echo -e "$(date -u +%T.%3N) :: INFO :: Cleaning ${RED}Go${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
 cd "${SINGLE_THREAD_DIR}"
 make clean
 
-echo -e "INFO :: Cleaning ${RED}Go${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
+echo -e "$(date -u +%T.%3N) :: INFO :: Cleaning ${RED}Go${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
 cd "${MULTI_THREAD_DIR}"
 make clean
 
-echo -e "INFO :: Compling ${RED}Go${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}Go${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
 cd "${SINGLE_THREAD_DIR}"
 make release
 
-echo -e "INFO :: Compling ${RED}Go${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}Go${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 make release

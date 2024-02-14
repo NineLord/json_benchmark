@@ -22,11 +22,11 @@ echo -e "INFO :: Cleaning ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Threa
 cd "${MULTI_THREAD_DIR}"
 rm -rf node_modules
 
-echo -e "INFO :: Compling ${RED}NodeJs${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}NodeJs${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
 cd "${SINGLE_THREAD_DIR}"
 npm install --omit=dev
 
-echo -e "INFO :: Compling ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 npm install --omit=dev
 

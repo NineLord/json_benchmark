@@ -15,21 +15,21 @@ GREEN="\e[32m"
 ENDCOLOR="\e[0m"
 #endregion
 
-echo -e "INFO :: Cleaning Java Downloaded Packages"
+echo -e "$(date -u +%T.%3N) :: INFO :: Cleaning Java Downloaded Packages"
 rm -rf "${MAVEN_LOCAL_REPOSITORY}"
 
-echo -e "INFO :: Cleaning ${RED}Java${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
+echo -e "$(date -u +%T.%3N) :: INFO :: Cleaning ${RED}Java${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
 cd "${SINGLE_THREAD_DIR}"
 mvn -U clean
 
-echo -e "INFO :: Cleaning ${RED}Java${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
+echo -e "$(date -u +%T.%3N) :: INFO :: Cleaning ${RED}Java${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
 cd "${MULTI_THREAD_DIR}"
 mvn -U clean
 
-echo -e "INFO :: Compling ${RED}Java${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}Java${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread"
 cd "${SINGLE_THREAD_DIR}"
 mvn compile
 
-echo -e "INFO :: Compling ${RED}Java${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
+echo -e "$(date -u +%T.%3N) :: INFO :: Compling ${RED}Java${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread"
 cd "${MULTI_THREAD_DIR}"
 mvn compile
