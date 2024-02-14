@@ -71,16 +71,16 @@ SINGLE_SAMPLING_INTERVAL=10
 #endregion
 
 #region Multi Thread Test
-MULTI_50_CONFIG=2 # 8
+MULTI_50_CONFIG=50
 MULTI_50_TEST_COUNTER=10000
 
-MULTI_75_CONFIG=3 # 12
+MULTI_75_CONFIG=75
 MULTI_75_TEST_COUNTER=2000
 
-MULTI_100_CONFIG=4 # 16
+MULTI_100_CONFIG=100
 MULTI_100_TEST_COUNTER=100
 
-MULTI_125_CONFIG=5 # 20
+MULTI_125_CONFIG=125
 MULTI_125_TEST_COUNTER=100
 #endregion
 #endregion
@@ -282,16 +282,6 @@ mkdir -p "${OUTPUT_DIR}"
 #endregion
 
 #region Full Benchmark
-# "${CLEAN_COMPILE_BUN}"
-#region Always skipping those tests, it takes more than 15 minute for single thread test, at this point there is not reason to run them. TOO SLOW
-# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
-# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
-#endregion
-# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
-# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
-# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-
 # "${CLEAN_COMPILE_RUST}"
 # setupSingleThreadTest "Rust" "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
 # setupMultiThreadTest "Rust" "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
@@ -305,9 +295,21 @@ mkdir -p "${OUTPUT_DIR}"
 # setupSingleThreadTest "Java" "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
 # setupMultiThreadTest "Java" "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
-# "${CLEAN_COMPILE_NODE_JS}"
+"${CLEAN_COMPILE_NODE_JS}"
 # setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
 # setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 # setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD_BUN_RECORDER}" "BunRecorder"
-# setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
+setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
+
+"${CLEAN_COMPILE_BUN}"
+#region Always skipping those tests, it takes more than 15 minute for single thread test, at this point there is not reason to run them. TOO SLOW
+# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
+# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 #endregion
+# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
+# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_BIG_LIMIT}" "bigLimit"
+setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
+#endregion
+
+# Shaked-TODO: add to the README info about changing the number of cores, in this file and in the generatInput file
