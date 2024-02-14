@@ -243,8 +243,10 @@ setupMultiThreadTest() {
 #endregion
 
 #region Making sure output directory is ready
-echo "$(date -u +%T.%3N) :: INFO :: Cleaning the output directory: ${OUTPUT_DIR}"
-rm -rf "${OUTPUT_DIR}"
+# echo "$(date -u +%T.%3N) :: INFO :: Cleaning the output directory: ${OUTPUT_DIR}"
+# rm -rf "${OUTPUT_DIR}"
+
+echo "$(date -u +%T.%3N) :: INFO :: Creating the output directory: ${OUTPUT_DIR}"
 mkdir -p "${OUTPUT_DIR}"
 #endregion
 
@@ -295,21 +297,21 @@ mkdir -p "${OUTPUT_DIR}"
 # setupSingleThreadTest "Java" "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
 # setupMultiThreadTest "Java" "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
-"${CLEAN_COMPILE_NODE_JS}"
+# "${CLEAN_COMPILE_NODE_JS}"
 # setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
 # setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
 # setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD_BUN_RECORDER}" "BunRecorder"
-setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
+# setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
 
-"${CLEAN_COMPILE_BUN}"
+# "${CLEAN_COMPILE_BUN}"
 #region Always skipping those tests, it takes more than 15 minute for single thread test, at this point there is not reason to run them. TOO SLOW
 # setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
 # setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 #endregion
-# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
+setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
 # setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
 # setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
+# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
 #endregion
 
 # Shaked-TODO: add to the README info about changing the number of cores, in this file and in the generatInput file
