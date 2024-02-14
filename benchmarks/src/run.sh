@@ -57,13 +57,38 @@ BUN_MULTI_THREAD_CMD_LIMIT="bun run start_bun_limit -- -s @FULL_PATH_XLSX -t @NU
 BUN_MULTI_THREAD_CMD_BIG_LIMIT="bun run start_bun_big_limit -- -s @FULL_PATH_XLSX -t @NUMBER_OF_THREADS @FULL_PATH_CONFIG @TEST_COUNTER"
 #endregion
 
+#region Test Settings
+NUMBER_OF_CORES=16
+NUMBER_OF_THREADS=15
+
+#region Single Thread Test
+SINGLE_JSON="${HUGE_JSON}"
+SINGLE_TEST_COUNTER=5
+SINGLE_NUMBER_OF_LETTERS=8
+SINGLE_DEPTH=10
+SINGLE_NUMBER_OF_CHILDREN=5
+SINGLE_SAMPLING_INTERVAL=10
+#endregion
+
+#region Multi Thread Test
+MULTI_50_CONFIG=2 # 8
+MULTI_50_TEST_COUNTER=10000
+
+MULTI_75_CONFIG=3 # 12
+MULTI_75_TEST_COUNTER=2000
+
+MULTI_100_CONFIG=4 # 16
+MULTI_100_TEST_COUNTER=100
+
+MULTI_125_CONFIG=5 # 20
+MULTI_125_TEST_COUNTER=100
+#endregion
+#endregion
+
 RED="\e[31m"
 GREEN="\e[32m"
 CYAN="\e[36m"
 ENDCOLOR="\e[0m"
-
-NUMBER_OF_CORES=16
-NUMBER_OF_THREADS=15
 #endregion
 
 #region Helper methods
@@ -120,6 +145,25 @@ runSingleThreadTest() {
     node "${SUM_UP_RECORD_CPU_DIR}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 1>/dev/null 2>/dev/null
 }
 
+setupSingleThreadTest() {
+    SETUP_SINGLE_LANG="${1}"
+    SETUP_SINGLE_JSON_FILE="${SINGLE_JSON}"
+    SETUP_SINGLE_TEST_COUNTER="${SINGLE_TEST_COUNTER}"
+    SETUP_SINGLE_NUMBER_OF_LETTERS="${SINGLE_NUMBER_OF_LETTERS}"
+    SETUP_SINGLE_DEPTH="${SINGLE_DEPTH}"
+    SETUP_SINGLE_NUMBER_OF_CHILDREN="${SINGLE_NUMBER_OF_CHILDREN}"
+    SETUP_SINGLE_SAMPLING_INTERVAL="${SINGLE_SAMPLING_INTERVAL}"
+    SETUP_SINGLE_EXEC_DIR="${2}"
+    SETUP_SINGLE_EXEC_CMD="${3}"
+    SETUP_SINGLE_TEST_TYPE="${4}"
+
+    runSingleThreadTest "${SETUP_SINGLE_LANG}" "${SETUP_SINGLE_JSON_FILE}" \
+        "${SETUP_SINGLE_TEST_COUNTER}" "${SETUP_SINGLE_NUMBER_OF_LETTERS}" \
+        "${SETUP_SINGLE_DEPTH}" "${SETUP_SINGLE_NUMBER_OF_CHILDREN}" \
+        "${SETUP_SINGLE_SAMPLING_INTERVAL}" "${SETUP_SINGLE_EXEC_DIR}" \
+        "${SETUP_SINGLE_EXEC_CMD}" "${SETUP_SINGLE_TEST_TYPE}"
+}
+
 runMultiThreadTest() {
     LANG="${1}"
     CONFIG="${2}"
@@ -166,10 +210,40 @@ runMultiThreadTest() {
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
     node "${SUM_UP_RECORD_CPU_DIR}" "${FULL_PATH_CSV}" "${NUMBER_OF_CORES}" 1>/dev/null 2>/dev/null
 }
+
+setupMultiThreadTest() {
+    SETUP_MULTI_LANG="${1}"
+    SETUP_MULTI_CONFIG="${MULTI_50_CONFIG}"
+    SETUP_MULTI_TEST_COUNTER="${MULTI_50_TEST_COUNTER}"
+    SETUP_MULTI_EXEC_DIR="${2}"
+    SETUP_MULTI_EXEC_CMD="${3}"
+    SETUP_MULTI_TEST_TYPE="${4}"
+    runMultiThreadTest "${SETUP_MULTI_LANG}" "${SETUP_MULTI_CONFIG}" \
+        "${SETUP_MULTI_TEST_COUNTER}" "${SETUP_MULTI_EXEC_DIR}" \
+        "${SETUP_MULTI_EXEC_CMD}" "${SETUP_MULTI_TEST_TYPE}"
+
+    SETUP_MULTI_CONFIG="${MULTI_75_CONFIG}"
+    SETUP_MULTI_TEST_COUNTER="${MULTI_75_TEST_COUNTER}"
+    runMultiThreadTest "${SETUP_MULTI_LANG}" "${SETUP_MULTI_CONFIG}" \
+        "${SETUP_MULTI_TEST_COUNTER}" "${SETUP_MULTI_EXEC_DIR}" \
+        "${SETUP_MULTI_EXEC_CMD}" "${SETUP_MULTI_TEST_TYPE}"
+
+    SETUP_MULTI_CONFIG="${MULTI_100_CONFIG}"
+    SETUP_MULTI_TEST_COUNTER="${MULTI_100_TEST_COUNTER}"
+    runMultiThreadTest "${SETUP_MULTI_LANG}" "${SETUP_MULTI_CONFIG}" \
+        "${SETUP_MULTI_TEST_COUNTER}" "${SETUP_MULTI_EXEC_DIR}" \
+        "${SETUP_MULTI_EXEC_CMD}" "${SETUP_MULTI_TEST_TYPE}"
+
+    SETUP_MULTI_CONFIG="${MULTI_125_CONFIG}"
+    SETUP_MULTI_TEST_COUNTER="${MULTI_125_TEST_COUNTER}"
+    runMultiThreadTest "${SETUP_MULTI_LANG}" "${SETUP_MULTI_CONFIG}" \
+        "${SETUP_MULTI_TEST_COUNTER}" "${SETUP_MULTI_EXEC_DIR}" \
+        "${SETUP_MULTI_EXEC_CMD}" "${SETUP_MULTI_TEST_TYPE}"
+}
 #endregion
 
 #region Making sure output directory is ready
-echo "INFO :: Cleaning the output directory: ${OUTPUT_DIR}"
+echo "$(date -u +%T.%3N) :: INFO :: Cleaning the output directory: ${OUTPUT_DIR}"
 rm -rf "${OUTPUT_DIR}"
 mkdir -p "${OUTPUT_DIR}"
 #endregion
@@ -209,62 +283,31 @@ mkdir -p "${OUTPUT_DIR}"
 
 #region Full Benchmark
 # "${CLEAN_COMPILE_BUN}"
-#region Always skipping those tests, it takes more than 15 minute for each one, at this point there is not reason to run them. TOO SLOW
-# runSingleThreadTest "Bun" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
-# runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Bun" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
+#region Always skipping those tests, it takes more than 15 minute for single thread test, at this point there is not reason to run them. TOO SLOW
+# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
+# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 #endregion
-
-# runSingleThreadTest "Bun" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
-# runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
-# runMultiThreadTest "Bun" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
-# runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
-# runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
-
-# runSingleThreadTest "Bun" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-# runMultiThreadTest "Bun" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-# runMultiThreadTest "Bun" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-# runMultiThreadTest "Bun" 4 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-# runMultiThreadTest "Bun" 5 100 "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
+# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
+# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_BIG_LIMIT}" "bigLimit"
+# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
 
 # "${CLEAN_COMPILE_RUST}"
-# runSingleThreadTest "Rust" "${HUGE_JSON}" 5 8 10 5 10 "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
-# runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
-# runMultiThreadTest "Rust" 3 2000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
-# runMultiThreadTest "Rust" 4 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
-# runMultiThreadTest "Rust" 5 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
-
-# runMultiThreadTest "Rust" 2 10000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Rust" 3 2000 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Rust" 4 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Rust" 5 100 "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+# setupSingleThreadTest "Rust" "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
+# setupMultiThreadTest "Rust" "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+# setupMultiThreadTest "Rust" "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 
 # "${CLEAN_COMPILE_GO}"
-# runSingleThreadTest "Go" "${HUGE_JSON}" 5 8 10 5 10 "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
-# runMultiThreadTest "Go" 2 10000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Go" 3 2000 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Go" 4 100 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Go" 5 100 "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
+# setupSingleThreadTest "Go" "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
+# setupMultiThreadTest "Go" "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
 
 # "${CLEAN_COMPILE_JAVA}"
-# runSingleThreadTest "Java" "${HUGE_JSON}" 5 8 10 5 10 "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
-# runMultiThreadTest "Java" 2 10000 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Java" 3 2000 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Java" 4 100 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
-# runMultiThreadTest "Java" 5 100 "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+# setupSingleThreadTest "Java" "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
+# setupMultiThreadTest "Java" "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
 # "${CLEAN_COMPILE_NODE_JS}"
-# runSingleThreadTest "NodeJs" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
-# runMultiThreadTest "NodeJs" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
-# runMultiThreadTest "NodeJs" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
-# runMultiThreadTest "NodeJs" 4 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
-# runMultiThreadTest "NodeJs" 5 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
-
-# runSingleThreadTest "NodeJs" "${HUGE_JSON}" 5 8 10 5 10 "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD_BUN_RECORDER}" "BunRecorder"
-# runMultiThreadTest "NodeJs" 2 10000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
-# runMultiThreadTest "NodeJs" 3 2000 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
-# runMultiThreadTest "NodeJs" 4 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
-# runMultiThreadTest "NodeJs" 5 100 "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
+# setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
+# setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+# setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD_BUN_RECORDER}" "BunRecorder"
+# setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
 #endregion

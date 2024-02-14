@@ -14,11 +14,11 @@ GREEN="\e[32m"
 ENDCOLOR="\e[0m"
 #endregion
 
-echo -e "INFO :: Cleaning ${RED}NodeJs${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
+echo -e "$(date -u +%T.%3N) :: INFO :: Cleaning ${RED}NodeJs${ENDCOLOR} ${GREEN}Single${ENDCOLOR} Thread Compiled Data"
 cd "${SINGLE_THREAD_DIR}"
 rm -rf node_modules
 
-echo -e "INFO :: Cleaning ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
+echo -e "$(date -u +%T.%3N) :: INFO :: Cleaning ${RED}NodeJs${ENDCOLOR} ${GREEN}Multi${ENDCOLOR} Thread Compiled Data"
 cd "${MULTI_THREAD_DIR}"
 rm -rf node_modules
 
