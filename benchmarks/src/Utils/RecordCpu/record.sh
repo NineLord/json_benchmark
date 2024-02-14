@@ -20,7 +20,7 @@ echo -en "CPU Average:,,CPU Maximum:,,CPU Minimum:,\nCPU Average (out of $intNum
 for ((index=1; index<="${numberOfCores}"; index++)); do
     echo -en "Core ${index}," >> "$filePath"
 done
-echo -e "Sum Cores,Avg Cores,RAM Used (MB),Total RAM,Swp Used (MB),Total Swp," >> "$filePath"
+echo -e "My Avg Cores,Avg Cores,RAM Used (MB),Total RAM,Swp Used (MB),Total Swp," >> "$filePath"
 
 echo "Starting to run!"
 while true; do

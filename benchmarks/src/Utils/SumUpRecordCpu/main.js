@@ -87,6 +87,7 @@ function sumUp(worksheet, numberOfCores) {
 		swpSum += swp;
 		swpSumMaximum = swpSumMaximum === null ? swp : Math.max(swpSumMaximum, swp);
 		swpSumMinimum = swpSumMinimum === null ? swp : Math.min(swpSumMinimum, swp);
+		sumAverageCores = sumAverageCores / numberOfCores;
 		row.getCell(numberOfCores + 1).value = `${sumAverageCores}%`;
 		cpuSumOutOfAll += sumAverageCores;
 		cpuSumOutOfAllMaximum = cpuSumOutOfAllMaximum === null ? sumAverageCores : Math.max(cpuSumOutOfAllMaximum, sumAverageCores);
@@ -104,9 +105,9 @@ function sumUp(worksheet, numberOfCores) {
 	const cpuAverageOutOfAllCell = worksheet.getRow(2).getCell(2);
 	cpuAverageOutOfAllCell.value = cpuSumOutOfAll / numberOfRows;
 	const cpuMaximumOutOfAllCell = worksheet.getRow(2).getCell(4);
-	cpuMaximumOutOfAllCell.value = cpuSumOutOfAllMaximum / numberOfCores;
+	cpuMaximumOutOfAllCell.value = cpuSumOutOfAllMaximum;
 	const cpuMinimumOutOfAllCell = worksheet.getRow(2).getCell(6);
-	cpuMinimumOutOfAllCell.value = cpuSumOutOfAllMinimum / numberOfCores;
+	cpuMinimumOutOfAllCell.value = cpuSumOutOfAllMinimum;
 
 	const ramAverageCell = worksheet.getRow(3).getCell(2);
 	ramAverageCell.value = ramSum / numberOfRows;
