@@ -59,7 +59,7 @@ BUN_MULTI_THREAD_CMD_BIG_LIMIT="bun run start_bun_big_limit -- -s @FULL_PATH_XLS
 
 #region Test Settings
 NUMBER_OF_CORES=16
-NUMBER_OF_THREADS=15
+let "NUMBER_OF_THREADS = ${NUMBER_OF_CORES} - 1"
 
 #region Single Thread Test
 SINGLE_JSON="${HUGE_JSON}"
@@ -135,7 +135,7 @@ runSingleThreadTest() {
         -e 's/@NUMBER_OF_CHILDREN/${NUMBER_OF_CHILDREN}/g' \
         -e 's/@SAMPLING_INTERVAL/${SAMPLING_INTERVAL}/g' \
     )
-    eval "${EXEC}" 1>/dev/null 2>/dev/null
+    eval "${EXEC}" # 1>/dev/null 2>/dev/null
     cd "${PREVIOUS_WORKING_DIR}"
 
     kill "${RECORD_CPU_PID}"
@@ -284,34 +284,32 @@ mkdir -p "${OUTPUT_DIR}"
 #endregion
 
 #region Full Benchmark
-# "${CLEAN_COMPILE_RUST}"
-# setupSingleThreadTest "Rust" "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
-# setupMultiThreadTest "Rust" "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
-# setupMultiThreadTest "Rust" "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
+"${CLEAN_COMPILE_RUST}"
+setupSingleThreadTest "Rust" "${RUST_SINGLE_THREAD_DIR}" "${RUST_SINGLE_THREAD_CMD}"
+setupMultiThreadTest "Rust" "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD_SINGLE}" "single"
+setupMultiThreadTest "Rust" "${RUST_MULTI_THREAD_DIR}" "${RUST_MULTI_THREAD_CMD}"
 
-# "${CLEAN_COMPILE_GO}"
-# setupSingleThreadTest "Go" "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
-# setupMultiThreadTest "Go" "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
+"${CLEAN_COMPILE_GO}"
+setupSingleThreadTest "Go" "${GO_SINGLE_THREAD_DIR}" "${GO_SINGLE_THREAD_CMD}"
+setupMultiThreadTest "Go" "${GO_MULTI_THREAD_DIR}" "${GO_MULTI_THREAD_CMD}"
 
-# "${CLEAN_COMPILE_JAVA}"
-# setupSingleThreadTest "Java" "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
-# setupMultiThreadTest "Java" "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
+"${CLEAN_COMPILE_JAVA}"
+setupSingleThreadTest "Java" "${JAVA_SINGLE_THREAD_DIR}" "${JAVA_SINGLE_THREAD_CMD}"
+setupMultiThreadTest "Java" "${JAVA_MULTI_THREAD_DIR}" "${JAVA_MULTI_THREAD_CMD}"
 
-# "${CLEAN_COMPILE_NODE_JS}"
-# setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
-# setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
-# setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD_BUN_RECORDER}" "BunRecorder"
-# setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
+"${CLEAN_COMPILE_NODE_JS}"
+setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD}"
+setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD}"
+setupSingleThreadTest "NodeJs" "${NODE_SINGLE_THREAD_DIR}" "${NODE_SINGLE_THREAD_CMD_BUN_RECORDER}" "BunRecorder"
+setupMultiThreadTest "NodeJs" "${NODE_MULTI_THREAD_DIR}" "${NODE_MULTI_THREAD_CMD_BUN_POOL}" "BunPool"
 
-# "${CLEAN_COMPILE_BUN}"
+"${CLEAN_COMPILE_BUN}"
 #region Always skipping those tests, it takes more than 15 minute for single thread test, at this point there is not reason to run them. TOO SLOW
 # setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD}"
 # setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD}"
 #endregion
 setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_LIMIT}" "limit"
-# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
-# setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_BIG_LIMIT}" "bigLimit"
-# setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
+setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_LIMIT}" "limit"
+setupSingleThreadTest "Bun" "${NODE_SINGLE_THREAD_DIR}" "${BUN_SINGLE_THREAD_CMD_BIG_LIMIT}" "bigLimit"
+setupMultiThreadTest "Bun" "${NODE_MULTI_THREAD_DIR}" "${BUN_MULTI_THREAD_CMD_BIG_LIMIT}" "bigLimit"
 #endregion
-
-# Shaked-TODO: add to the README info about changing the number of cores, in this file and in the generatInput file

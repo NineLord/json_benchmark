@@ -26,6 +26,9 @@ cargo build --bin json_generator --release
 ```shell
 cd "./json_benchmark/benchmarks/input"
 node ./generateInput.js
+5. In the `generateInput.js` file in the `input` directory  
+   and the `run.sh` file in the `src` directory,  
+   change the variable `NUMBER_OF_CORES` to the number of cores you want to test.
 ```
 
 ### Run the tests
