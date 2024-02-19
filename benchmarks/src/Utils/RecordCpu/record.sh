@@ -1,4 +1,9 @@
 #!/bin/bash
+shutdown() {
+    echo "Trapped TERM Signal"
+    exit 0
+}
+trap shutdown TERM
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 

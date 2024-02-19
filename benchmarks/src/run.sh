@@ -138,7 +138,8 @@ runSingleThreadTest() {
     eval "${EXEC}" # 1>/dev/null 2>/dev/null
     cd "${PREVIOUS_WORKING_DIR}"
 
-    kill "${RECORD_CPU_PID}"
+    kill -TERM "${RECORD_CPU_PID}"
+    wait "${RECORD_CPU_PID}"
 
     echo "$(date -u +%T.%3N) :: INFO :: Fixing up report files" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
@@ -204,7 +205,8 @@ runMultiThreadTest() {
     eval "${EXEC}" 1>/dev/null 2>/dev/null
     cd "${PREVIOUS_WORKING_DIR}"
 
-    kill "${RECORD_CPU_PID}"
+    kill -TERM "${RECORD_CPU_PID}"
+    wait "${RECORD_CPU_PID}"
 
     echo "$(date -u +%T.%3N) :: INFO :: Fixing up report files" >/dev/tty
     node "${CLEAR_WORKSHEETS_DIR}" "${FULL_PATH_XLSX}" 1>/dev/null 2>/dev/null
